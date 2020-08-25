@@ -1,108 +1,96 @@
-let current = '';
-let previous = '';
-let numbers = document.querySelectorAll('.number');
-let operations = document.querySelectorAll('.operation');
-let previous_div = document.querySelector('.previous')
-let current_div = document.querySelector('.current')
-let extras = document.querySelectorAll('.extras')
-let point = document.getElementById('point')
-let equals = document.getElementById('equals')
+const CURRENT_DIV = document.querySelector(".current");
+const PREVIOUS_DIV = document.querySelector(".previous");
+let running_OP = "";
+let shouldRestart = false;
 
-
-equals.addEventListener('click', (id) => {
-
-    current_div.innerHTML = calculate(previous);
-    previous_div.innerHTML = '';
-    previous = '';
-
-})
-
-point.addEventListener('click', (id) => {
-    if (!current_div.innerHTML.includes('.')) {
-        if (current_div.innerHTML.length == 0)
-            current_div.innerHTML += '0.';
-    }
-})
-
-
-extras.forEach(element => {
-    element.addEventListener('click', handleExtras, false);
-})
-
-
-numbers.forEach(element => {
-    element.addEventListener('click', handleNumbers, false);
-});
-
-operations.forEach(element => {
-    element.addEventListener('click', handleOperations, false);
-})
-
-function handleExtras(extrasId) {
-
-    if (current_div.innerHTML.length > 0)
-
-        switch (extrasId.target.innerHTML) {
-        case 'AC':
-            current_div.innerHTML = '';
-            previous_div.innerHTML = '';
-            current = '';
-            previous = '';
-            break;
-
-        case 'DEL':
-
-            current_div.innerHTML = current_div.innerHTML.slice(0, current.length - 1);
-            break;
+const initNumbers = () => {
+  const numbers = document.querySelectorAll(".number");
+  numbers.forEach((number) => {
+    number.addEventListener("click", (event) => {
+      if (shouldRestart) {
+        PREVIOUS_DIV.innerHTML = "";
+        shouldRestart = false;
+      }
+      if (event.target.innerHTML !== ".")
+        CURRENT_DIV.innerHTML += event.target.innerHTML;
+      else if (!CURRENT_DIV.innerHTML.includes("."))
+        CURRENT_DIV.innerHTML += event.target.innerHTML;
+    });
+  });
+};
+const initExtras = () => {
+  const extras = document.querySelectorAll(".extras");
+  extras.forEach((extra) => {
+    extra.addEventListener("click", (event) => {
+      switch (event.target.id) {
+        case "clear":
+          CURRENT_DIV.innerHTML = "";
+          PREVIOUS_DIV.innerHTML = "";
+          running_OP = "";
+          break;
+        case "delete":
+          CURRENT_DIV.innerHTML = CURRENT_DIV.innerHTML.slice(
+            0,
+            CURRENT_DIV.innerHTML.length - 1
+          );
+          break;
 
         default:
-
-            break;
-    }
-}
-
-function handleOperations(symbol) {
-
-    if (current_div.innerHTML.replace('-', '').length > 0) {
-
-        if (previous == '') {
-            previous = symbol.target.innerHTML;
-            previous_div.innerHTML = current_div.innerHTML + previous;
-            current_div.innerHTML = '';
-
-        } else {
-            current = symbol.target.innerHTML;
-            previous_div.innerHTML = calculate(previous);
-            previous = current;
-            current_div.innerHTML = '';
+          break;
+      }
+    });
+  });
+};
+const initOperations = () => {
+  const operations = document.querySelectorAll(".operation");
+  operations.forEach((operation) => {
+    operation.addEventListener("click", (event) => {
+      if (PREVIOUS_DIV.innerHTML === "") {
+        if (CURRENT_DIV.innerHTML !== "") {
+          running_OP = event.target.innerHTML;
+          PREVIOUS_DIV.innerHTML = CURRENT_DIV.innerHTML + running_OP;
         }
-    } else {
-        if (symbol.target.innerHTML == '-') {
-            current_div.innerHTML = '-'
-        }
-    }
+      } else if (event.target.innerHTML === "=") {
+        handleOP();
+        shouldRestart = true;
+      } else {
+        handleOP();
+        running_OP = event.target.innerHTML;
+        PREVIOUS_DIV.innerHTML += running_OP;
+      }
+
+      CURRENT_DIV.innerHTML = "";
+    });
+  });
+};
+
+function handleOP() {
+  let num1 = parseFloat(
+    PREVIOUS_DIV.innerHTML.slice(0, PREVIOUS_DIV.innerHTML.length - 1)
+  );
+  let num2 = parseFloat(CURRENT_DIV.innerHTML);
+  switch (running_OP) {
+    case "+":
+      PREVIOUS_DIV.innerHTML = `${num1 + num2}`;
+      break;
+
+    case "-":
+      PREVIOUS_DIV.innerHTML = `${num1 - num2}`;
+      break;
+
+    case "*":
+      PREVIOUS_DIV.innerHTML = num1 * num2;
+      break;
+
+    case "/":
+      PREVIOUS_DIV.innerHTML = num1 / num2;
+      break;
+
+    default:
+      break;
+  }
 }
 
-function calculate(operationData) {
-    let num1 = previous_div.innerHTML.slice(0, previous_div.innerHTML.length - 1);
-    switch (operationData) {
-        case '+':
-            return parseFloat(num1) + parseFloat(current_div.innerHTML) + current;
-
-        case '-':
-            return parseFloat(num1) - parseFloat(current_div.innerHTML) + current;
-
-        case '/':
-            return parseFloat(num1) / parseFloat(current_div.innerHTML) + current;
-
-        case '*':
-            return parseFloat(num1) * parseFloat(current_div.innerHTML) + current;
-
-        default:
-            break;
-    }
-}
-
-function handleNumbers(number) {
-    current_div.innerHTML += number.target.innerHTML;
-}
+initOperations();
+initExtras();
+initNumbers();
