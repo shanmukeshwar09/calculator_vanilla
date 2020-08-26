@@ -16,8 +16,10 @@ body {
 
 .grid-class {
   display: grid;
-  grid-template-columns: repeat(4, 100px);
-  grid-template-rows: repeat(6, 100px);
+  max-width: 100%;
+  margin: 9px;
+  grid-template-columns: repeat(4, 72px);
+  grid-template-rows: repeat(6, 72px);
 }
 
 #equals,
@@ -37,18 +39,16 @@ body {
 }
 
 .previous {
-  font-size: 2rem;
-  margin: 5px 0px;
+  font-size: 1.8rem;
 }
 
 .current {
   font-size: 1.4rem;
-  margin: 5px 0px;
 }
 
 button {
   background-color: rgba(255, 255, 255, 0.7);
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   outline: none;
   border: 1px solid white;
 }

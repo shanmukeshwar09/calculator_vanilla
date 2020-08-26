@@ -8,6 +8,7 @@ const initNumbers = () => {
   numbers.forEach((number) => {
     number.addEventListener("click", (event) => {
       if (shouldRestart) {
+        CURRENT_DIV.innerHTML = PREVIOUS_DIV.innerHTML;
         PREVIOUS_DIV.innerHTML = "";
         shouldRestart = false;
       }
@@ -45,7 +46,11 @@ const initOperations = () => {
   const operations = document.querySelectorAll(".operation");
   operations.forEach((operation) => {
     operation.addEventListener("click", (event) => {
-      if (PREVIOUS_DIV.innerHTML === "") {
+      if (shouldRestart) {
+        running_OP = event.target.innerHTML;
+        PREVIOUS_DIV.innerHTML += running_OP;
+        shouldRestart = false;
+      } else if (PREVIOUS_DIV.innerHTML === "") {
         if (CURRENT_DIV.innerHTML !== "") {
           running_OP = event.target.innerHTML;
           PREVIOUS_DIV.innerHTML = CURRENT_DIV.innerHTML + running_OP;
